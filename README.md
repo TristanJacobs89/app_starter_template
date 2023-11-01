@@ -81,6 +81,8 @@ The core concept of this project is the automation of a new project setup and be
 - Add option to select between an existing (or local) database or a new one
 - Generate dynamic environment variables
 - Update documentation
+- Add GitHub CD/CI
+- Add Husky
 
 ## Could haves
 
