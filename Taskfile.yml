@@ -1,0 +1,122 @@
+version: "3"
+
+tasks:
+  init:
+    cmds:
+      - echo "🕙 Initializing project...";
+      - task create-docker-compose;
+      - echo "🎉 Project initialized successfully!";
+      - task help
+
+  init-cms:
+    cmds:
+      - if [ -d backend ]; then
+        echo "👋 Backend folder already exists, skipping creation.";
+        else
+        echo "🕙 Creating backend folder...";
+        mkdir backend;
+        touch backend/.gitkeep;
+        echo "node_modules\npublic/uploads" > backend/.gitignore;
+        fi
+      - echo "✅ Finished initializing CMS folder"
+
+  install:
+    cmds:
+      - echo "🕙 Installing Directus CMS and NextJS..."
+      - task install-frontend
+      - task start-cms
+      - echo "✅ Finished installing Directus CMS and NextJS."
+
+  install-frontend:
+    cmds:
+      - chmod +x ./scripts/install-frontend.sh
+      - ./scripts/install-frontend.sh
+      - echo "✅ Frontend installed."
+
+  install-cms:
+    cmds:
+      - task start-cms
+
+  up:
+    cmds:
+      - echo "🚀 Starting Docker containers..."
+      - docker-compose up -d
+      - echo "✅ Docker containers started."
+
+  stop:
+    cmds:
+      - echo "🛑 Stopping Docker containers..."
+      - docker-compose stop
+      - echo "✅ Docker containers stopped."
+
+  down:
+    cmds:
+      - echo "🛑 Stopping and removing Docker containers..."
+      - docker-compose down
+      - echo "✅ Docker containers stopped and removed."
+
+  start:
+    cmds:
+      - task assert-docker-compose
+      - task up
+
+  start-frontend:
+    cmds:
+      - task assert-docker-compose
+      - echo "🚀 Starting NextJS..."
+      - docker-compose up -d nextjs
+
+  start-cms:
+    cmds:
+      - task assert-docker-compose
+      - echo "🚀 Starting Directus CMS..."
+      - docker-compose up -d database
+      - docker-compose up -d cache
+      - docker-compose up -d directus
+
+  stop-frontend:
+    cmds:
+      - echo "🛑 Stopping NextJS..."
+      - docker-compose stop nextjs
+
+  stop-cms:
+    cmds:
+      - echo "🛑 Stopping Directus CMS..."
+      - docker-compose stop directus
+
+  lint:
+    cmds:
+      - echo "🕙 Linting frontend code..."
+      - docker-compose exec nextjs npm run lint
+      - echo "✅ Finished linting code."
+
+  format:
+    cmds:
+      - echo "🕙 Formatting frontend code..."
+      - docker-compose exec nextjs npm run format
+      - echo "✅ Finished formatting code."
+
+  test:
+    cmds:
+      - echo "🕙 Running frontend tests..."
+      - docker-compose run --rm nextjs npm run test
+      - echo "✅ Finished running tests."
+
+  assert-docker-compose:
+    cmds:
+      - if [ ! -f docker-compose.yml ]; then
+        echo "❌ docker-compose.yml file not found. Please run 'task init' first.";
+        exit 1;
+        fi
+
+  create-docker-compose:
+    cmds:
+      - cp templates/docker-compose.yml.template docker-compose.yml
+
+  help:
+    cmds:
+      - bash ./scripts/help.sh
+
+  clean:
+    cmds:
+      - bash ./scripts/clean.sh
