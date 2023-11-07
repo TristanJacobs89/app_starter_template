@@ -5,6 +5,7 @@ tasks:
     cmds:
       - echo "🕙 Initializing project...";
       - task create-docker-compose;
+      - task create-env-file;
       - echo "🎉 Project initialized successfully!";
       - task help
 
@@ -112,6 +113,10 @@ tasks:
   create-docker-compose:
     cmds:
       - cp templates/docker-compose.yml.template docker-compose.yml
+
+  create-env-file:
+    cmds:
+      - cp templates/.env.example .env
 
   help:
     cmds:
